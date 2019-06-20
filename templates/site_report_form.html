@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  <h2>New {{ site.name }} Report</h2>
+  <form>
+    {{ form.hidden_tag() }}
+    {% if site.reportFreq == "daily" %}
+      <div>
+        {{ form.date.label }}
+        {{ form.date }}
+      </div>
+      <div>
+        {{ form.closed }}
+        {{ form.closed.label }}
+      </div>
+    {% elif site.reportFreq == "monthly" %}
+      <div>
+        {{ form.year.label }}
+        {{ form.year }}
+      </div>
+      <div>
+        {{ form.month.label }}
+        {{ form.month }}
+      </div>
+    {% else %} {# FIXME #}
+      Unexpected reporting frequency.
+    {% endif %}
+    <fieldset>
+      <legend>Visit Counts</legend>
+      {% for id, name in site.categories.items() %}
+        <div>
+          {{ form[id].label }}
+          {{ form[id](min=0, step=1) }}
+        </div>
+      {% endfor %}
+    </fieldset>
+    <div>
+      {{ form.notes.label }}
+      {{ form.notes }}
+    </div>
+    <button>Submit</button>
+  </form>
+{% endblock %}

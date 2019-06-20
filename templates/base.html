@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}MNHS Site Reports</title>
+
+    <!-- The core Firebase JS SDK is always required and must be
+         listed first -->
+    <script
+        src="https://www.gstatic.com/firebasejs/5.10.1/firebase.js"
+    >
+    </script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#config-web-app -->
+
+    <script>
+     // Firebase configuration
+     var firebaseConfig = {
+     };
+     // Initialize Firebase
+     firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script
+        src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"
+    >
+    </script>
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css"
+    >
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+  </head>
+  <body>
+    <nav>
+      <h1>MNHS Site Reports</h1>
+      <a href="/">Home</a>
+      <div id="login-info" hidden=true>
+        {% if user_data %}
+          <dl>
+            <dt>Name</dt><dd>{{ user_data['name'] }}</dd>
+            <dt>Email</dt><dd>{{ user_data['email'] }}</dd>
+          </dl>
+        {% elif error_message %}
+          <p>Error: {{ error_message }}</p>
+        {% endif %}
+      </div>
+      <button id="sign-out" hidden=true>Sign Out</button>
+      <hr>
+    </nav>
+    <div id="firebaseui-auth-container"></div>
+    
+    <main id="main" hidden="true">
+      {% if user_data %}
+        {% block content %}{% endblock %}
+      {% endif %}
+    </main>
+  </body>
+</html>
