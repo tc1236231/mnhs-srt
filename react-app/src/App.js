@@ -1,18 +1,16 @@
 // TODO: Handle sign in failure
 
+// START WITH THE REPORTING FREQ FORM INPUTS
+
 import React from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import firebase from 'firebase';
 import logo from './logo.svg';
 import './App.css';
-
-// TODO: Keep out of version control!!!
-// Configure Firebase.
-const config = {
-
-};
-firebase.initializeApp(config);
+import Header from './Header';
+import SignIn from './SignIn';
+import MyReports from './MyReports';
+import Report from './Report';
 
 const dummy_user = {
   email: 'samuel.courtier@mnhs.org',
@@ -38,223 +36,36 @@ const dummy_user = {
      ]}
   ],
   reports: [
-    {submit_dt: 'a submit dt',
-     site_id: 'mhc',
-     site_name: 'Minnesota History Center',
-     report_date: 'a report date',
+    {siteId: 'mhc',
+     siteName: 'Minnesota History Center',
+     date: '2019-06-24',
      closed: true,
-     counts: {
-       adult: 100,
-       child: 200,
-       program: 300},
+     counts: {adult: 100, child: 200, program: 300},
      notes: 'Here are some notes'},
-    {submit_dt: 'another submit dt',
-     site_id: 'hfs',
-     site_name: 'Historic Fort Snelling',
-     report_month_start: 'a month start',
-     counts: {
-       adult: 4000,
-       child: 5000},
+    {siteId: 'hfs',
+     siteName: 'Historic Fort Snelling',
+     year: 2019,
+     month: 4,
+     counts: {adult: 4000, child: 5000},
      notes: 'Here are some other notes'}]};
 
-const Header = ({isSignedIn}) => (
-  <header>
-    <h1>My App</h1>
-    {isSignedIn &&
-     <div>
-       <nav>
-         <ul>
-           <li><Link to="/">My Reports</Link></li>
-           <li><Link to="/form">New Report</Link></li>
-         </ul>
-       </nav>
-       <div>
-         <div>{firebase.auth().currentUser.displayName}</div>
-         <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
-       </div>
-     </div>}
-  </header>
-);
-
-function SignIn() {
-  const firebaseUiConfig = {
-    signInFlow: 'popup',
-    signInOptions: [
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      firebase.auth.EmailAuthProvider.PROVIDER_ID
-    ],
-    callbacks: {
-      // Avoid redirects after sign-in.
-      signInSuccessWithAuthResult: () => false
-    }
-  };
-  
-  return (
-    <div>
-      <Header />
-      <p>Please sign-in:</p>
-      <StyledFirebaseAuth
-        uiConfig={firebaseUiConfig}
-        firebaseAuth={firebase.auth()}
-      />
-    </div>
-  );
-}
-
-const Index = () => (
-  <div>
-    <h2>Index</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Submit Datetime</th>
-          <th>Site Name</th>
-          <th>Report Period</th>
-          <th>Closed?</th>
-          <th>Counts</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {dummy_user.reports.map(r => (
-          <tr>
-            <td>{r.submit_dt}</td>
-            <td>{r.site_name}</td>
-            <td>{r.report_date || r.report_month_start}</td>
-            <td>{r.closed && "Yes"}</td>
-            <td>
-              {Object.keys(r.counts).map((c, i) => (
-                <span>{i > 0 && ","} {c}: {r.counts[c]}</span>
-              ))}
-            </td>
-            <td>{r.notes}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
-
-class Form extends React.Component {
-  state = {
-    submit_dt: 'a submit dt',
-    site_id: 'mhc',
-    report_date: 'a report date',
-    closed: true,
-    counts: {
-      adult: 100,
-      child: 200,
-      program: 300},
-    notes: 'Here are some notes'};
-  
-  handleChange = (e) => {
-    const name = e.target.name;
-    const value = (e.target.type === 'checkbox') ? (
-      e.target.checked
-    ) : (
-      e.target.value);
-
-    if (name.startsWith('count-')) {
-      const categoryId = name.split("-")[1];
-      this.setState({counts: {...this.state.counts, [categoryId]: value}});
-    } else {
-      this.setState({[name]: value});
-    }
-  };
-  
-  handleSubmit = (e) => {
-    alert('A form was submitted: ' + JSON.stringify(this.state));
-    e.preventDefault();
-  };
-
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <div>
-          <label htmlFor="submit_dt">Submit Date:</label>
-          <input
-            type="text"
-            id="submit_dt"
-            name="submit_dt"
-            value={this.state.submit_dt}
-            onChange={this.handleChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="site_id">Site:</label>
-          <select
-            id="site_id"
-            name="site_id"
-            value={this.state.site_id}
-            onChange={this.handleChange}
-          >
-            {dummy_user.sites.map(s => (
-              <option value={s.id}>{s.name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="report_date">Report Date:</label>
-          <input
-            type="text"
-            id="report_date"
-            name="report_date"
-            value={this.state.report_date}
-            onChange={this.handleChange}
-          />
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            id="closed"
-            name="closed"
-            value={this.state.closed}
-            onChange={this.handleChange}
-          />
-          <label htmlFor="closed">Closed?:</label>
-        </div>
-        <fieldset>
-          <legend>Visit Counts</legend>
-          {dummy_user.sites
-           .find(s => s.id === this.state.site_id)
-           .categories.map(c => (
-             <div>
-               <label htmlFor={"count-" + c.id}>{c.name}:</label>
-               <input
-                 type="number"
-                 id={"count-" + c.id}
-                 name={"count-" + c.id}
-                 value={this.state.counts[c.id]}
-                 min="0"
-                 setp="1"
-                 onChange={this.handleChange}
-               />
-             </div>
-           ))}
-        </fieldset>
-        <div>
-          <label htmlFor="notes">Notes</label>
-          <textarea
-            id="notes"
-            name="notes"
-            value={this.state.notes}
-            onChange={this.handleChange}
-          />
-        </div>
-        <button>Submit</button>
-      </form>
-    );
+const fakeDB = {
+  fetchUserData(cb) {
+    setTimeout(
+      () => cb(dummy_user),
+      1);
   }
-}
+};
 
 class App extends React.Component {
-  state = {
-    isSignedIn: false,
-  };
-  
+  constructor(props) {
+    super(props);
+    this.state = {user: undefined};
+  }
+
   componentDidMount() {
     this.unregisterAuthObserver = firebase.auth().onAuthStateChanged(
-      (user) => this.setState({isSignedIn: !!user})
+      this.handleAuthStateChanged
     );
   }
   
@@ -262,23 +73,54 @@ class App extends React.Component {
     this.unregisterAuthObserver();
   }
 
+  handleAuthStateChanged = user => {
+    if (user) {
+      fakeDB.fetchUserData(
+        this.handleFetchUserDataSuccess);
+    } else {
+      this.setState({user: false});
+    }
+  }
+
+  handleFetchUserDataSuccess = userData => {
+    this.setState({user: userData});
+  }
+
+  handleFetchUserDataError = e => {
+    /// IMPLEMENT
+  }
+
   render() {
+    if (this.state.user === false) return <SignIn />;
+
     return (
-      <Router>
-        <div>
-          {!this.state.isSignedIn ? (
-            <SignIn />
-          ) : (
-            <div>
-              <Header isSignedIn={this.state.isSignedIn} />
-              <Route path="/" exact component={Index} />
-              <Route path="/form" component={Form} />
-            </div>
-          )}
-        </div>
-      </Router>
+      <div>
+        <Header user={this.state.user} />
+        {this.state.user ? (
+          <main>
+            <Route
+              path="/"
+              exact
+              render={props => (
+                <MyReports reports={this.state.user.reports} />)}
+            />
+            <Route
+              path="/form"
+              render={props => <Report user={this.state.user} />}
+            />
+          </main>
+        ) : (
+          "Loading..."
+        )}
+      </div>
     );
   }
 }
 
-export default App;
+const AppRouter = () => (
+  <Router>
+    <App />
+  </Router>
+);
+
+export default AppRouter;

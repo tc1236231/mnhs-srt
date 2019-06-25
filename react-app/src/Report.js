@@ -1,0 +1,288 @@
+import React from 'react';
+import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import { object, number, string, boolean, date } from 'yup';
+
+const currentDate = new Date();
+
+const startYear = 2010;
+const years = [startYear];
+const currentYear = currentDate.getFullYear();
+while (years[years.length - 1] < currentYear) {
+  years.push(years[years.length - 1] + 1);
+}
+
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+  'September', 'October', 'November', 'December'];
+const currentMonth = currentDate.getMonth();
+
+let getSite = (sites, siteId) => sites.find(s => s.id === siteId);
+
+const initSiteValues = (values, site) => {
+  if (site.reportFreq === 'monthly') {
+    delete values.date;
+    delete values.closed;
+    values.year = currentMonth === 0 ? currentYear - 1 : currentYear;
+    values.month = currentMonth === 0 ? 11 : currentMonth - 1;
+  } else {
+    delete values.year;
+    delete values.month;
+    values.date = new Date().toISOString().split('T')[0];
+  }
+
+  values.counts = {};
+  site.categories.forEach(c => {
+    values.counts[c.id] = '';
+  });
+};
+
+const initialValues = sites => {
+  let values = {
+    'site-id': '',
+    counts: {},
+    notes: ''
+  };
+  
+  if (sites.length === 1) {
+    values['site-id'] = sites[0].id;
+    initSiteValues(values, sites[0]);
+  }
+  
+  return values;
+};
+
+const Report = ({ user }) => (
+  <div>
+    <h2>New Site Report</h2>
+    <Formik
+      initialValues={initialValues(user.sites)}
+      validationSchema={object().shape({
+        'site-id': string().required('Please choose a site.'),
+        date: date()
+          .when('site-id', {
+            is: siteId => getSite(user.sites, siteId).reportFreq !== 'monthly',
+            then: date()
+              .required('Please enter a date.')
+              .typeError('Please enter a valid date.')
+              .max(new Date(), 'Please enter a current or past date.')
+              .test(
+                'already submitted',
+                "You've already submitted a report for this date.",
+                value => (
+                  user.reports
+                    .map(r => r.date)
+                    .indexOf(value.toISOString().split('T')[0])
+                    === -1)
+              )
+          }),
+        closed: boolean(),
+        year: number()
+          .when('site-id', {
+            is: siteId => getSite(user.sites, siteId).reportFreq === 'monthly',
+            then: number().required('Please choose a year.'),
+          }),
+        month: number()
+          .when('site-id', {
+            is: siteId => getSite(user.sites, siteId).reportFreq === 'monthly',
+            then: number()
+              .required('Please choose a month.')
+              .when('year', {
+                is: year => year === currentYear,
+                then: number().max(
+                  currentMonth - 1, 'Please choose a past month.'),
+                otherwise: number()
+              })
+              .when(['year', 'month'], {
+                is: (year, month) => user.reports.some(
+                  r => year === r.year && month === r.month
+                ),
+                then: number().test(
+                  'month-already-submitted',
+                  "You've already submitted a report for this month.",
+                  () => false
+                )
+              })
+          }),
+        notes: string()
+      })}
+      onSubmit={(values, { setSubmitting }) => {
+        setTimeout(() => {
+          alert(JSON.stringify(values, null, 2));
+          setSubmitting(false);
+        }, 400);
+      }}
+    >
+      {({ values, touched, errors, handleChange, isSubmitting }) => {
+        let getSelectedSite = () => getSite(user.sites, values['site-id']);
+        
+        return (
+          <Form>
+            <div className="form-group">
+              <label htmlFor="site-id">
+                For which site are you reporting?
+              </label>
+              <Field
+                className="form-control"
+                component="select"
+                name="site-id"
+                id="site-id"
+                disabled={user.sites.length === 1}
+                onChange={e => {
+                  if (!values['site-id']
+                      || window.confirm(
+                        "This will clear fields you've entered. Continue?")
+                     )
+                  {
+                    initSiteValues(values, getSite(user.sites, e.target.value));
+                    handleChange(e);
+                  }
+                }}
+              >
+                {!values['site-id'] && <option value=""></option>}
+                {user.sites.map(s => <option value={s.id}>{s.name}</option>)}
+              </Field>
+              <div className="form-text text-danger">
+                <ErrorMessage name="site-id" />
+              </div>
+            </div>
+            {values['site-id'] && values['site-id'] !== '' && (
+              <div>
+                {getSelectedSite().reportFreq === 'monthly' ? (
+                  <div>
+                    <label>
+                      This report concerns which month?
+                    </label>
+                    <div className="row">
+                      <div className="form-group col-6">
+                        <Field
+                          className="form-control"
+                          component="select"
+                          name="month"
+                          id="month"
+                        >
+                          {months.map((m, i) => <option value={i}>{m}</option>)}
+                        </Field>
+                      </div>
+                      <div className="form-group col-6">
+                        <Field
+                          className="form-control"
+                          component="select"
+                          name="year"
+                          id="year"
+                        >
+                          {years.map(y => <option value={y}>{y}</option>)}
+                        </Field>
+                        <div className="form-text text-danger">
+                          <ErrorMessage name="year" />
+                        </div>
+                      </div>
+                      <div className="form-text text-danger mx-auto">
+                        {errors.month &&
+                         <div className="form-text text-danger">
+                           {errors.month}
+                         </div>}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="form-group">
+                      <label htmlFor="date">
+                        This report concerns which date?
+                      </label>
+                      <Field
+                        className="form-control"
+                        type="date"
+                        name="date"
+                        id="date"
+                      />
+                      {errors.date &&
+                       <div className="form-text text-danger">
+                         {errors.date}
+                       </div>}
+                    </div>
+                    <div className="form-check my-2">
+                      <Field
+                          className="form-check-input"
+                          type="checkbox"
+                          name="closed"
+                          id="closed"
+                        />
+                      <label className="form-check-lable" htmlFor="closed">
+                        <strong>
+                          Check here if this site was closed on the selected date.
+                        </strong>
+                      </label>
+                      <div className="form-text text-danger">
+                        <ErrorMessage name="closed" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!values.closed && (
+                  <fieldset className="my-2">
+                    <legend>Visit Counts</legend>
+                    <div className="form-text my-3">
+                      Please enter the number of visitors that attended in each category:
+                    </div>
+                    {getSelectedSite().categories.map(c => (
+                      <div className="form-group">
+                        <label htmlFor={"counts." + c.id}>{c.name}</label>
+                        <Field
+                          className="form-control"
+                          type="number"
+                          name={"counts." + c.id}
+                          id={"counts." + c.id}
+                          min="0"
+                          step="1"
+                        />
+                        <div className="form-text text-danger">
+                          <ErrorMessage
+                          name={"counts." + c.id}
+                          component="div"
+                        />
+                        </div>
+                      </div>
+                    ))}
+                  </fieldset>
+                )}
+                <div className="form-group">
+                  <label htmlFor="notes">
+                    Please note anything that may have significantly effected attendance
+                    {getSelectedSite().reportFreq === "monthly" ?
+                     " during the month." :
+                     " on the reporting day."}
+                  </label>
+                  <Field
+                    className="form-control"
+                    component="textarea"
+                    name="notes"
+                    id="notes" />
+                  <div className="form-text text-danger">
+                    <ErrorMessage name="notes" component="div" />
+                  </div>
+                </div>
+                {Object.keys(errors).length > 0 && (
+                  <div className="form-text text-danger mt-1 mb-3">
+                    <strong>
+                      You must correct the issues above before submitting.
+                    </strong>
+                  </div>)
+                }
+                <button
+                  className="btn btn-primary"
+                  type="submit"
+                  disabled={Object.keys(errors).length > 0 || isSubmitting}
+                >
+                  Submit
+                </button>
+              </div>
+            )}
+          </Form>
+        );
+      }}
+    </Formik>
+  </div>
+);
+
+export default Report;
