@@ -223,24 +223,33 @@ const Report = ({ user }) => (
                   <fieldset className="my-2">
                     <legend>Visit Counts</legend>
                     <div className="form-text my-3">
-                      Please enter the number of visitors that attended in each category:
+                      Please enter the number of visitors that attended in each category. For guidance in categorizing visitors, click <a href="#">here</a>.
                     </div>
                     {getSelectedSite().categories.map(c => (
-                      <div className="form-group">
-                        <label htmlFor={"counts." + c.id}>{c.name}</label>
-                        <Field
-                          className="form-control"
-                          type="number"
-                          name={"counts." + c.id}
-                          id={"counts." + c.id}
-                          min="0"
-                          step="1"
-                        />
+                      <div>
+                        <div className="form-group row">
+                          <label
+                            className="col-2 col-form-label"
+                            htmlFor={"counts." + c.id}
+                          >
+                            {c.name}
+                          </label>
+                          <div className="col-10">
+                            <Field
+                              className="form-control"
+                              type="number"
+                              name={"counts." + c.id}
+                              id={"counts." + c.id}
+                              min="0"
+                              step="1"
+                            />
+                          </div>
+                        </div>
                         <div className="form-text text-danger">
                           <ErrorMessage
-                          name={"counts." + c.id}
-                          component="div"
-                        />
+                            name={"counts." + c.id}
+                            component="div"
+                          />
                         </div>
                       </div>
                     ))}

@@ -25,7 +25,9 @@ const MyReports = ({reports}) => (
             <td>{r.closed && "Yes"}</td>
             <td>
               {Object.keys(r.counts).map((c, i) => (
-                <span>{i > 0 && ","} {c}: {r.counts[c]}</span>
+                <div className="text-nowrap">
+                  {c}: {r.counts[c]}
+                </div>
               ))}
             </td>
             <td>{r.notes}</td>
