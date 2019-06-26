@@ -229,12 +229,12 @@ const Report = ({ user }) => (
                       <div>
                         <div className="form-group row">
                           <label
-                            className="col-2 col-form-label"
+                            className="col-6 col-form-label"
                             htmlFor={"counts." + c.id}
                           >
                             {c.name}
                           </label>
-                          <div className="col-10">
+                          <div className="col-6">
                             <Field
                               className="form-control"
                               type="number"
