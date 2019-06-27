@@ -13,23 +13,31 @@ const MyReports = ({reports}) => (
           <th>Report Period</th>
           <th>Closed?</th>
           <th>Counts</th>
+          <th>Date Submitted</th>
           <th>Notes</th>
         </tr>
       </thead>
       <tbody>
         {reports.map(r => (
           <tr>
-            <td>{r.siteName}</td>
+            <td>{r.site.name}</td>
             {r.date && <td>{r.date}</td>}
-            {r.year && r.month && <td>{months[r.month] + ", " + r.year}</td>}
+            {r.year && r.month &&
+             <td>{months[r.month - 1] + ", " + r.year}</td>}
             <td>{r.closed && "Yes"}</td>
             <td>
-              {Object.keys(r.counts).map((c, i) => (
-                <div className="text-nowrap">
-                  {c}: {r.counts[c]}
-                </div>
+              {r.counts.map(c => (
+                <ul className="small list-unstyled">
+                  <li className="my-0">
+                    <span className="font-italic mr-1">
+                      {c.category.name}:
+                    </span>
+                    <span><strong>{c.count}</strong></span>
+                  </li>
+                </ul>
               ))}
             </td>
+            <td>{r.submitTS.split('T')[0]}</td>
             <td>{r.notes}</td>
           </tr>
         ))}

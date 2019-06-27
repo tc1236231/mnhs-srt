@@ -12,11 +12,11 @@ const Header = ({user}) => (
             <Link className="nav-link" to="/">My Reports</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/form">New Report</Link>
+            <Link className="nav-link" to="/report">New Report</Link>
           </li>
         </ul>
         <div>
-          <span className="text-light">{user.name}</span>
+          <span className="text-light">{user.displayName}</span>
           <button
             className="btn btn-secondary ml-4"
             onClick={() => firebase.auth().signOut()}>Sign-out
