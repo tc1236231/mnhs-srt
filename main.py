@@ -1,4 +1,5 @@
 import os
+import functools
 
 import google.oauth2.id_token
 from google.auth.transport import requests
@@ -16,7 +17,6 @@ app.secret_key = 'abcdef123456'
 api = Api(app)
 
 
-@app.before_request
 def verify_firebase_auth():
     id_token = request.cookies.get('token')
     error_message = None
@@ -38,10 +38,20 @@ def verify_firebase_auth():
         abort(401)
 
 
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        verify_firebase_auth()
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
-    if path != "" and os.path.exists(app.static_folder + path):
+    if path != '' and os.path.exists(app.static_folder + path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(
@@ -49,6 +59,8 @@ def serve_react_app(path):
 
 
 class User(Resource):
+    decorators = [login_required]
+
     def get(self, email):
         user = storage.user(email)
 
@@ -87,6 +99,8 @@ class User(Resource):
 
 
 class Report(Resource):
+    decorators = [login_required]
+
     def post(self):
         return storage.add_report(request.json)
 

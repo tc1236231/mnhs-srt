@@ -47,6 +47,7 @@ class App extends React.Component {
         // .finally
       });
     } else {
+      document.cookie = "token=";
       this.setState({user: false});
     }
   }
