@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, number, string, boolean, date } from 'yup';
 
 const currentDate = new Date();
@@ -273,7 +273,7 @@ const Report = ({ user, updateUserData }) => (
           count: values.counts[cuuid]
         }));
         
-        axios.post('report', report)
+        axios.post('/api/report', report)
           .then(r => {
             setSubmitting(false);
             updateUserData();

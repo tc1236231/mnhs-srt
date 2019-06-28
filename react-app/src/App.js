@@ -1,7 +1,5 @@
 // TODO: Handle sign in failure
 
-// START WITH THE REPORTING FREQ FORM INPUTS
-
 import React from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import firebase from 'firebase';
@@ -29,16 +27,25 @@ class App extends React.Component {
   }
   
   updateUserData = () => axios
-    .get('/user/' + this.state.user.email)
+    .get('/api/user/' + this.state.user.email)
     .then(r => this.setState({user: r.data}));
 
   handleAuthStateChanged = user => {
     if (user) {
-      axios
-        .get('/user/' + user.email)
-        .then(r => this.setState({user: r.data}));
-      // .catch
-      // .finally
+      user.getIdToken().then(token => {
+        
+        // Add the token to the browser's cookies. The server will then be
+        // able to verify the token against the API.
+        // SECURITY NOTE: As cookies can easily be modified, only put the
+        // token (which is verified server-side) in a cookie; do not add other
+        // user information.
+        document.cookie = "token=" + token;
+        axios
+          .get('/api/user/' + user.email)
+          .then(r => this.setState({user: r.data}));
+        // .catch
+        // .finally
+      });
     } else {
       this.setState({user: false});
     }

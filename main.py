@@ -1,9 +1,8 @@
 import os
-import json
 
 import google.oauth2.id_token
 from google.auth.transport import requests
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, abort
 from flask_restful import Resource, Api
 
 import storage
@@ -23,25 +22,20 @@ def verify_firebase_auth():
     error_message = None
     claims = None
 
+    print(id_token)
+
     if id_token:
         try:
-            # Verify the token against the Firebase Auth API. This example
-            # verifies the token on each page load. For improved performance,
-            # some applications may wish to cache results in an encrypted
-            # session store (see for instance
-            # http://flask.pocoo.org/docs/1.0/quickstart/#sessions).
             claims = google.oauth2.id_token.verify_firebase_token(
                 id_token, firebase_request_adapter)
         except ValueError as exc:
             # This will be raised if the token is expired or any other
             # verification checks fail.
             error_message = str(exc)
+            abort(401)
 
-#            return 'You are not authorized to view this.'
-
-    else:
-        pass
-#        return 'You are not authorized to view this.'
+    if not claims:
+        abort(401)
 
 
 @app.route('/', defaults={'path': ''})
@@ -100,5 +94,5 @@ class Report(Resource):
     # return(blob.download_as_string())
 
 
-api.add_resource(User, '/user/<email>')
-api.add_resource(Report, '/report')
+api.add_resource(User, '/api/user/<email>')
+api.add_resource(Report, '/api/report')

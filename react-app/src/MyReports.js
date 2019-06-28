@@ -27,14 +27,16 @@ const MyReports = ({reports}) => (
             <td>{r.closed && "Yes"}</td>
             <td>
               {r.counts.map(c => (
-                <ul className="small list-unstyled">
-                  <li className="my-0">
-                    <span className="font-italic mr-1">
-                      {c.category.name}:
-                    </span>
-                    <span><strong>{c.count}</strong></span>
-                  </li>
-                </ul>
+                c.count === '' ? 'None' : (
+                  <ul className="small list-unstyled">
+                    <li className="my-0">
+                      <span className="font-italic mr-1">
+                        {c.category.name}:
+                      </span>
+                      <span><strong>{c.count}</strong></span>
+                    </li>
+                  </ul>
+                )
               ))}
             </td>
             <td>{r.submitTS.split('T')[0]}</td>
