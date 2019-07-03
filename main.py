@@ -62,7 +62,10 @@ class User(Resource):
     decorators = [login_required]
 
     def get(self, email):
-        user = storage.user(email)
+        try:
+            user = storage.user(email)
+        except:
+            return {}
 
         enriched_user = dict(
             email=email,

@@ -33,7 +33,9 @@ class App extends React.Component {
     .get('/api/user/' + email)
     .then(r => 
       {
-        this.setState({user: r.data, loading: false}); 
+        if(Object.keys(r.data).length == 0)
+          this.setState({error: {message: "Failed to fetch user info, does this account exist?"}});
+        this.setState({user: r.data, loading: false});
       }
     )
     .catch( err => this.setState({error: err}));
@@ -61,6 +63,15 @@ class App extends React.Component {
   render() {
     if (this.state.user === false && this.state.loading === false) 
       return <SignIn />;
+
+    if(this.state.error)
+    {
+      return (
+        <DivWithErrorHandling showError={this.state.error}>
+          <Header user={this.state.user} />
+        </DivWithErrorHandling>
+      );
+    }
 
     return (
       <DivWithErrorHandling showError={this.state.error}>
