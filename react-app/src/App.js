@@ -10,11 +10,13 @@ import Header from './Header';
 import SignIn from './SignIn';
 import MyReports from './MyReports';
 import Report from './Report';
+import DivWithErrorHandling from './DivWithErrorHandling';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: undefined};
+    this.state = {user: undefined, loading: false};
+    this.updateUserData = this.updateUserData.bind(this);
   }
 
   componentDidMount() {
@@ -26,12 +28,20 @@ class App extends React.Component {
     this.unregisterAuthObserver();
   }
   
-  updateUserData = () => axios
-    .get('/api/user/' + this.state.user.email)
-    .then(r => this.setState({user: r.data}));
-
+  updateUserData(email) {
+    axios
+    .get('/api/user/' + email)
+    .then(r => 
+      {
+        this.setState({user: r.data, loading: false}); 
+      }
+    )
+    .catch( err => this.setState({error: err}));
+  }
+  
   handleAuthStateChanged = user => {
     if (user) {
+      this.setState({loading: true});
       user.getIdToken().then(token => {
         
         // Add the token to the browser's cookies. The server will then be
@@ -40,11 +50,7 @@ class App extends React.Component {
         // token (which is verified server-side) in a cookie; do not add other
         // user information.
         document.cookie = "token=" + token;
-        axios
-          .get('/api/user/' + user.email)
-          .then(r => this.setState({user: r.data}));
-        // .catch
-        // .finally
+        this.updateUserData(user.email);
       });
     } else {
       document.cookie = "token=";
@@ -53,10 +59,11 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.user === false) return <SignIn />;
+    if (this.state.user === false && this.state.loading === false) 
+      return <SignIn />;
 
     return (
-      <div>
+      <DivWithErrorHandling showError={this.state.error}>
         <Header user={this.state.user} />
         {this.state.user ? (
           <main>
@@ -72,9 +79,9 @@ class App extends React.Component {
             />
           </main>
         ) : (
-          "Loading..."
+          <h1 className="p-3">Loading...</h1>
         )}
-      </div>
+      </DivWithErrorHandling>
     );
   }
 }

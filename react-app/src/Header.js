@@ -17,13 +17,18 @@ const Header = ({user}) => (
         </ul>
         <div>
           <span className="text-light">{user.displayName}</span>
-          <button
-            className="btn btn-secondary ml-4"
-            onClick={() => firebase.auth().signOut()}>Sign-out
-          </button>
         </div>
       </div>
     )}
+    {
+      firebase.auth().currentUser &&
+      (
+        <button
+          className="btn btn-secondary ml-4"
+          onClick={() => {firebase.auth().signOut(); window.location.reload();}}>Sign-out
+        </button>
+      )
+    }
   </header>
 );
 
