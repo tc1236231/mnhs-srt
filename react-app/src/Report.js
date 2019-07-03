@@ -5,7 +5,7 @@ import { object, number, string, boolean, date } from 'yup';
 
 const currentDate = new Date();
 
-const startYear = 2010;
+let startYear = 2010;
 const years = [startYear];
 const currentYear = currentDate.getFullYear();
 while (years[years.length - 1] < currentYear) {
@@ -256,7 +256,6 @@ const Report = ({ user, updateUserData }) => (
         notes: string()
       })}
       onSubmit={(values, { setSubmitting, resetForm}) => {
-        // TODO: HANDLE ERRORS!!!
         console.log(values);
         let report = {
           submitterEmail: user.email,
@@ -265,9 +264,10 @@ const Report = ({ user, updateUserData }) => (
           date: values['date'],
           closed: values['closed'],
           year: values['year'],
-          month: values['month'] = parseInt(values['month']) + 1,
           notes: values['notes']
         };
+        if(values['month'])
+          report.month = parseInt(values['month']) + 1;
         report.counts = Object.keys(values.counts).map(cuuid => ({
           categoryUUID: cuuid,
           count: values.counts[cuuid]
@@ -276,14 +276,12 @@ const Report = ({ user, updateUserData }) => (
         axios.post('/api/report', report)
           .then(r => {
             setSubmitting(false);
-            updateUserData();
-            alert('Submitted -- thank you!');
+            updateUserData(user.email);
+            alert('Report Submitted, Thank You!');
             resetForm();
-          });
-        /*
-          .catch
-          .finally
-        */
+          }).catch(err => {
+              alert('There is an issue submitting the report, please retry or contact the BIPI staff. ' + err.message);
+          })
       }}
     >
       {({ values, touched, errors, handleChange, isSubmitting }) => {

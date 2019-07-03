@@ -27,7 +27,7 @@ const MyReports = ({reports}) => (
             <td>{r.closed && "Yes"}</td>
             <td>
               {r.counts.map(c => (
-                c.count === '' ? 'None' : (
+                c.count !== '' && (
                   <ul className="small list-unstyled">
                     <li className="my-0">
                       <span className="font-italic mr-1">

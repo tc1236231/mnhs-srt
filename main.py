@@ -83,7 +83,7 @@ class User(Resource):
 
             if report.get('date'):
                 enriched_report['date'] = report['date']
-                enriched_report['closed'] = report['closed']
+                enriched_report['closed'] = report.get('closed')
             elif report.get('year'):
                 enriched_report['year'] = report['year']
                 enriched_report['month'] = report['month']
