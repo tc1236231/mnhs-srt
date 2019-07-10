@@ -3,7 +3,7 @@ venv
 __pycache__
 .vscode
 .storybook
-
+mnhs-srt-*.json
 # Nodejs modules
 node_modules
 venv

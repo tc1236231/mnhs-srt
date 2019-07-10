@@ -133,7 +133,7 @@ function SiteDependentFields({sites, values, errors, isSubmitting}) {
         <fieldset className="my-2">
           <legend>Visit Counts</legend>
           <div className="form-text my-3">
-            Please enter the number of visitors that attended in each category. For guidance in categorizing visitors, click <a href="#">here</a>.
+            Please enter the number of visitors that attended in each category. For guidance in categorizing visitors, click <a target="_blank" href="https://docs.google.com/document/d/1z1zADs98XaGECbF1QWoJpUyMhbu-q_fWmQAYuzLqZDk/edit?usp=sharing">here</a>.
           </div>
           {getSelectedSite().categories.map(c => (
             <div>
