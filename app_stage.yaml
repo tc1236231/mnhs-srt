@@ -14,4 +14,4 @@ handlers:
   secure: always
 
 env_variables:
-  DW_BUCKET_URL: mnhs-srt-prod.appspot.com
+  DW_BUCKET_URL: mnhs-srt-test.appspot.com

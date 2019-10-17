@@ -1,12 +1,13 @@
 import datetime
 import json
+import os
 from uuid import uuid4
 
 from google.cloud import storage
 
 
 storage_client = storage.Client()
-bucket = storage_client.get_bucket('mnhs-srt-prod.appspot.com')
+bucket = storage_client.get_bucket(os.getenv('DW_BUCKET_URL'))
 
 
 def fetch(blob):
