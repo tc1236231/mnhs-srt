@@ -4,7 +4,6 @@ import React from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import firebase from 'firebase';
 import axios from 'axios';
-import logo from './logo.svg';
 import './App.css';
 import Header from './Header';
 import SignIn from './SignIn';
@@ -33,7 +32,7 @@ class App extends React.Component {
     .get('/api/user/' + email)
     .then(r => 
       {
-        if(Object.keys(r.data).length == 0)
+        if(Object.keys(r.data).length === 0)
           this.setState({error: {message: "Failed to fetch user info, does this account exist?"}});
         this.setState({user: r.data, loading: false});
       }

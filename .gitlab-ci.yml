@@ -4,37 +4,40 @@ stages:
   - build
   - deploy
 
-cache:
-  paths:
-  - react-app/node_modules
-
 build:
   image: node:alpine
   stage: build
   script:
     - cd react-app
     - npm install
-    - npm run-script build
+    - npm run build --prod || cat /root/.npm/_logs/*.log
+  artifacts:
+    untracked: true
 
 deploy_production:
   stage: deploy
   environment: Production
+  dependencies: 
+    - build
   only:
   - master
   script:
   - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
   - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
   - gcloud --quiet --project $PROJECT_ID app deploy app.yaml
+  after_script:
+  - rm /tmp/$CI_PIPELINE_ID.json
 
 deploy_staging:
   stage: deploy
   environment: Staging
+  dependencies: 
+    - build
   only:
   - stage
   script:
   - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
   - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
   - gcloud --quiet --project $PROJECT_ID app deploy app.yaml
-
-after_script:
-- rm /tmp/$CI_PIPELINE_ID.json
+  after_script:
+  - rm /tmp/$CI_PIPELINE_ID.json
