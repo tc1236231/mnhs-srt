@@ -6,9 +6,10 @@ stages:
 
 cache:
   paths:
-  - node_modules
+  - react-app/node_modules
 
 build:
+  image: node:alpine
   stage: build
   script:
     - cd react-app
