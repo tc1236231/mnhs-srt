@@ -9,7 +9,7 @@ build:
   stage: build
   script:
     - cd react-app
-    - apk --no-cache add g++ gcc libgcc libstdc++ linux-headers make python
+    - rm package-lock.json
     - npm install
     - npm run build --prod || cat /root/.npm/_logs/*.log
   artifacts:
