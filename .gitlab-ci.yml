@@ -5,11 +5,11 @@ stages:
   - deploy
 
 build:
-  image: node:alpine
+  image: node:12-alpine
   stage: build
   script:
     - cd react-app
-    - rm package-lock.json
+    - apk --no-cache add g++ gcc libgcc libstdc++ linux-headers make python
     - npm install
     - npm run build --prod || cat /root/.npm/_logs/*.log
   artifacts:
