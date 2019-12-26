@@ -10,3 +10,5 @@ venv
 .vscode
 .storybook
 stories
+db.sqlite3
+.idea

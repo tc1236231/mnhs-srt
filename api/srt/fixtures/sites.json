@@ -1,0 +1,184 @@
+[
+  {
+    "model": "srt.Site",
+    "pk": "8d288f8e-3ae0-411d-a742-e49278bee952",
+    "fields": {
+      "name": "Oliver Kelley Farm"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "09104ace-5ceb-47b3-9f90-8405c1f58afa",
+    "fields": {
+      "name": "Comstock House"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "d986117a-c1bc-47af-86be-13c3a7fa043d",
+    "fields": {
+      "name": "Mille Lacs Indian Museum"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "adddf740-b409-457b-a597-893b1f40242a",
+    "fields": {
+      "name": "Mill City Museum"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "e0af65fc-8f1f-4764-ab37-bca768cc47be",
+    "fields": {
+      "name": "Lac qui Parle Mission"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "08f8921f-4446-4aaf-9e34-183b55837d8a",
+    "fields": {
+      "name": "Snake River Fur Post"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "978d7c27-87f7-43e2-8883-d203ac805dd8",
+    "fields": {
+      "name": "Fort Ridgely"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "a51543d8-cd97-45fb-82de-00ddfd6dce1d",
+    "fields": {
+      "name": "Harkin Store"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "309d77a4-c633-422e-83e8-cc9e1b294ee7",
+    "fields": {
+      "name": "Forest History Center"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "57cc97d1-8406-4430-9476-b656eed7c97f",
+    "fields": {
+      "name": "Historic Forestville"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "37e3d25d-5692-43ef-a670-d9c9e311eab2",
+    "fields": {
+      "name": "Charles Lindbergh House"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "450e0d02-c8ec-4506-a0e9-b44be4668eb0",
+    "fields": {
+      "name": "Traverse des Sioux"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "f5c2e260-4606-4a8d-9a34-292f84781155",
+    "fields": {
+      "name": "W.W. Mayo House"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "688f20be-18b7-4dbd-818a-43a34420e9c9",
+    "fields": {
+      "name": "Marine Mill"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "4a5248d7-044a-4780-9eb4-07849ace6c84",
+    "fields": {
+      "name": "Minnesota State Capitol"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "c10f2191-c33d-468a-8419-28256619c5d8",
+    "fields": {
+      "name": "Jeffers Petroglyphs"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "6be9f83b-b7eb-4200-a339-2e74b3327067",
+    "fields": {
+      "name": "Minnesota History Center"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "9128fcfc-b1a1-450b-8af3-95852dc77d00",
+    "fields": {
+      "name": "Alexander Ramsey House"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "c9989397-3ee0-4225-8dc5-57874bd231a1",
+    "fields": {
+      "name": "Folsom House"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "e36fb28b-7629-4a1e-a7be-8b346152da86",
+    "fields": {
+      "name": "Split Rock Lighthouse"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "90ffe4d4-137b-4e7d-b4bc-c0392a7f7f55",
+    "fields": {
+      "name": "Minnehaha Depot"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "fb861968-543d-4f2b-ae7c-fb1c96f5b002",
+    "fields": {
+      "name": "James J. Hill House"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "6efcc035-878f-4872-ac4e-0239493f996a",
+    "fields": {
+      "name": "Historic Fort Snelling"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "58be6c72-4266-40d3-a8b7-ba2c49bb1bf3",
+    "fields": {
+      "name": "Sibley Historic Site"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "ba7d633b-389c-433b-8927-f967b9787287",
+    "fields": {
+      "name": "Birch Coulee Battlefield"
+    }
+  },
+  {
+    "model": "srt.Site",
+    "pk": "6d594cf1-650a-4452-a9a9-de9bae914105",
+    "fields": {
+      "name": "Lower Sioux Agency"
+    }
+  }
+]

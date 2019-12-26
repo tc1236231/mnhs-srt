@@ -1,0 +1,5 @@
+django==3.0.1
+djangorestframework
+django-monthfield
+django-polymorphic
+django-rest-polymorphic

@@ -1,0 +1,72 @@
+[
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "2bb8bc8c-64be-48d6-aaf3-7ce66abddcf3",
+    "fields": {
+      "name": "People Served On-Site"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "105d4f08-cdb6-40a6-80f7-1e8f3d18e293",
+    "fields": {
+      "name": "People Served Off-Site Outreach"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "ed787611-27ab-4e5e-86f4-58df092187e9",
+    "fields": {
+      "name": "People Served Off-Site Program"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "6d9c3dad-ceaa-416a-a720-9438e19d330d",
+    "fields": {
+      "name": "Special Program MNHS Member"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "f7aecfbb-923c-4e70-a036-fe2ffc3f0f2a",
+    "fields": {
+      "name": "Special Program Non-Member"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "0787fbf5-0b95-4f03-b3b9-439431d7c2e2",
+    "fields": {
+      "name": "Educational Program Adult"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "6871456c-6136-4cb6-bf71-631bef0238ee",
+    "fields": {
+      "name": "Educational Program Student"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "5f856084-1c2a-40ea-b74d-f4f3464a69b8",
+    "fields": {
+      "name": "Daily Program/Admission MNHS Member"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "0f801c98-2d72-4b32-b75b-9d648ba2ddfb",
+    "fields": {
+      "name": "Daily Program/Admission Trail Counter"
+    }
+  },
+  {
+    "model": "srt.AttendanceCategory",
+    "pk": "9fb7a4f4-b871-4d4d-b881-6b03a74e494e",
+    "fields": {
+      "name": "Daily Program/Admission Non-Member"
+    }
+  }
+]
