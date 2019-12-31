@@ -3,3 +3,4 @@ djangorestframework
 django-monthfield
 django-polymorphic
 django-rest-polymorphic
+django-nested-admin
