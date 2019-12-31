@@ -7,11 +7,24 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Formik, Field, Form } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { Typography } from '@material-ui/core';
 
-const EditReportDialog = ({reportUUID, siteName, reportDate, counts, handleClose, editReportFunc}) => {
+const EditReportDialog = ({
+        reportUUID, siteName, reportDate, items, notes, 
+        reportType, handleClose, editReportFunc, apiStatus
+    }) => {
     const validatelInteger = (num) => {
         return num !== Infinity && num >= 0 ? "" : "Incorrect Format"
     };
+
+    const initialVals = () => {
+        let vals = {
+            notes, 
+            counts: Object.assign({}, ...items.map((c,i) => ({[c.category.uuid]: c.count})))
+        };
+        return vals;
+    };
+    
 
     return (
         <Dialog
@@ -22,13 +35,18 @@ const EditReportDialog = ({reportUUID, siteName, reportDate, counts, handleClose
         >
             <DialogTitle id="alert-dialog-title">{"Edit Report"}</DialogTitle>
             <Formik
-            initialValues= { Object.assign({}, ...counts.map((c,i) => ({[c.category.uuid]: c.count}))) }
+            initialValues= {initialVals()}
             validate={values => {
                 const errors = {};
                 return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
-                editReportFunc({reportUUID, counts: values});
+                const submitValues = {notes: values.notes, resourcetype: reportType};
+                submitValues.items = Object.keys(values.counts).map(cuuid => ({
+                    category: cuuid,
+                    count: values.counts[cuuid]
+                }));
+                editReportFunc(reportUUID, submitValues);
                 setSubmitting(false);
             }}
             >
@@ -37,16 +55,16 @@ const EditReportDialog = ({reportUUID, siteName, reportDate, counts, handleClose
                     <div>
                     <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        You are editing the report of {siteName} on {reportDate}
+                        You are editing the report of <b>{siteName}</b> on <b>{reportDate}</b>
                     </DialogContentText>
                     <Form>
                         {
-                            counts.map((c, i) => {
+                            items.map((c, i) => {
                                 return (
                                     <Field
-                                        key={c.category.uuid}
-                                        name={c.category.uuid}
-                                        id={c.category.uuid}
+                                        key={"counts." + c.category.uuid}
+                                        name={"counts." + c.category.uuid}
+                                        id={"counts." + c.category.uuid}
                                         label={c.category.name}
                                         type="number"
                                         component={TextField}
@@ -56,13 +74,36 @@ const EditReportDialog = ({reportUUID, siteName, reportDate, counts, handleClose
                                 )
                             })
                         }
+                        <Field
+                            key='notes'
+                            name='notes'
+                            id='notes'
+                            label='Notes'
+                            type="text"
+                            component={TextField}
+                            fullWidth
+                        />
                     </Form>
                     </DialogContent>
                     <DialogActions>
+                    {
+                        apiStatus.action === "EDIT_REPORT" && apiStatus.status.status && (
+                            <Typography variant="h6">
+                                {apiStatus.status.status === 200 ? "Saved Successfully" : "ERROR, Please contact BIPI"}
+                            </Typography>
+                        )
+                    }
+                    {
+                        apiStatus.action === "EDIT_REPORT" && apiStatus.isFetching && (
+                            <Typography variant="h6">
+                                {"Pending"}
+                            </Typography>
+                        )
+                    }
                     <Button onClick={handleClose} color="primary" autoFocus>
                         Cancel
                     </Button>
-                    <Button onClick={submitForm} color="primary">
+                    <Button onClick={submitForm} color="primary" disabled={apiStatus.isFetching}>
                         Save
                     </Button>
                     </DialogActions>

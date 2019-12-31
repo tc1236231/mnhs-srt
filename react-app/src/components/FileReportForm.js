@@ -1,6 +1,7 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, number, string, boolean, date } from 'yup';
+import { Typography } from '@material-ui/core';
 
 const currentDate = new Date();
 
@@ -19,7 +20,7 @@ const currentMonth = currentDate.getMonth();
 const getSite = (sites, siteId) => sites.find(s => s.uuid === siteId);
 
 const initSiteValues = (values, site) => {
-  if (site.reportFreq === 'monthly') {
+  if (site.reportMode === 'MONTHLY') {
     delete values.date;
     delete values.closed;
     values.year = currentMonth === 0 ? currentYear - 1 : currentYear;
@@ -27,7 +28,8 @@ const initSiteValues = (values, site) => {
   } else {
     delete values.year;
     delete values.month;
-    values.date = new Date().toISOString().split('T')[0];
+    let localISOString = new Date(currentDate.getTime() - (currentDate.getTimezoneOffset() * 60000)).toISOString();
+    values.date = localISOString.split('T')[0];
   }
 
   values.counts = {};
@@ -56,7 +58,7 @@ function SiteDependentFields({sites, values, errors, isSubmitting}) {
   
   return (
     <div>
-      {getSelectedSite().reportFreq === 'monthly' ? (
+      {getSelectedSite().reportMode === 'MONTHLY' ? (
         <div>
           <label>
             This report concerns which month?
@@ -69,7 +71,7 @@ function SiteDependentFields({sites, values, errors, isSubmitting}) {
                 name="month"
                 id="month"
               >
-                {months.map((m, i) => <option key={m, i} value={i}>{m}</option>)}
+                {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
               </Field>
             </div>
             <div className="form-group col-6">
@@ -167,7 +169,7 @@ function SiteDependentFields({sites, values, errors, isSubmitting}) {
       <div className="form-group">
         <label htmlFor="notes">
           Please note anything that may have significantly effected attendance
-          {getSelectedSite().reportFreq === "monthly" ?
+          {getSelectedSite().reportMode === "MONTHLY" ?
            " during the month." :
            " on the reporting day."}
         </label>
@@ -198,20 +200,21 @@ function SiteDependentFields({sites, values, errors, isSubmitting}) {
   );
 }
 
-const FileReportForm = ({ user, fileReportFunc }) => {
-    if (typeof user === 'undefined' || user.sites === undefined)
+const FileReportForm = ({ user, reports, fileReportFunc, apiStatus}) => {
+    if (typeof user === 'undefined' || user.assignments === undefined)
         return <h2 style={{color: 'red'}}>Error: Not Enough User Info</h2>
-    else
+    else {
+        const sites = user.assignments.map(a => ({ ...a.site, categories: a.categories.map(c => c.category) }));
         return (
             <div>
                 <h2>New Site Report</h2>
                 <Formik
-                initialValues={initialValues(user.sites)}
+                initialValues={initialValues(sites)}
                 validationSchema={object().shape({
                     'site-id': string().required('Please choose a site.'),
                     date: date()
                     .when('site-id', {
-                        is: siteId => getSite(user.sites, siteId).reportFreq !== 'monthly',
+                        is: siteId => getSite(sites, siteId).reportMode !== 'MONTHLY',
                         then: date()
                         .required('Please enter a date.')
                         .typeError('Please enter a valid date.')
@@ -220,7 +223,7 @@ const FileReportForm = ({ user, fileReportFunc }) => {
                             'already submitted',
                             "You've already submitted a report for this date.",
                             value => (
-                            user.reports
+                            reports
                                 .map(r => r.date)
                                 .indexOf(value.toISOString().split('T')[0])
                                 === -1)
@@ -229,12 +232,12 @@ const FileReportForm = ({ user, fileReportFunc }) => {
                     closed: boolean(),
                     year: number()
                     .when('site-id', {
-                        is: siteId => getSite(user.sites, siteId).reportFreq === 'monthly',
+                        is: siteId => getSite(sites, siteId).reportMode === 'MONTHLY',
                         then: number().required('Please choose a year.'),
                     }),
                     month: number()
                     .when('site-id', {
-                        is: siteId => getSite(user.sites, siteId).reportFreq === 'monthly',
+                        is: siteId => getSite(sites, siteId).reportMode === 'MONTHLY',
                         then: number()
                         .required('Please choose a month.')
                         .when('year', {
@@ -244,7 +247,7 @@ const FileReportForm = ({ user, fileReportFunc }) => {
                             otherwise: number()
                         })
                         .when(['site-id', 'year', 'month'], {
-                            is: (siteId, year, month) => user.reports && user.reports.some(
+                            is: (siteId, year, month) => reports && reports.some(
                                 r => r.site.uuid === siteId
                                     && year === r.year
                                     && month === (r.month - 1)
@@ -259,21 +262,22 @@ const FileReportForm = ({ user, fileReportFunc }) => {
                     notes: string()
                 })}
                 onSubmit={(values, { setSubmitting, resetForm}) => {
-                    console.log(values);
                     let report = {
-                        submitterEmail: user.email,
-                        submitTS: new Date(),
-                        siteUUID: values['site-id'],
+                        submitter: user.uuid,
+                        site: values['site-id'],
                         date: values['date'],
                         closed: values['closed'],
                         year: values['year'],
-                        notes: values['notes']
+                        notes: values['notes'],
+                        resourcetype: 'DailyReport'
                     };
-                    if(values['month'])
-                        report.month = parseInt(values['month']) + 1;
+                    if(values['month']) {
+                      report.month = parseInt(values['month']) + 1;
+                      report.resourcetype = 'MonthlyReport';
+                    }
                     
-                    report.counts = Object.keys(values.counts).map(cuuid => ({
-                        categoryUUID: cuuid,
+                    report.items = Object.keys(values.counts).map(cuuid => ({
+                        category: cuuid,
                         count: values.counts[cuuid]
                     }));
                     
@@ -294,21 +298,21 @@ const FileReportForm = ({ user, fileReportFunc }) => {
                             component="select"
                             name="site-id"
                             id="site-id"
-                            disabled={user.sites.length === 1}
+                            disabled={sites.length === 1}
                             onChange={e => {
                             if (!values['site-id']
                                 || window.confirm(
                                     "This will clear fields you've entered. Continue?")
                                 )
                             {
-                                initSiteValues(values, getSite(user.sites, e.target.value));
+                                initSiteValues(values, getSite(sites, e.target.value));
                                 handleChange(e);
                             }
                             }}
                         >
                             {!values['site-id'] &&
                             <option value="">Select a site...</option>}
-                            {user.sites.map(s => <option key={s.uuid} value={s.uuid}>{s.name}</option>)}
+                            {sites.map(s => <option key={s.uuid} value={s.uuid}>{s.name}</option>)}
                         </Field>
                         <div className="form-text text-danger">
                             <ErrorMessage name="site-id" />
@@ -316,16 +320,32 @@ const FileReportForm = ({ user, fileReportFunc }) => {
                         </div>
                         {values['site-id'] && values['site-id'] !== '' &&
                         <SiteDependentFields
-                        sites={user.sites}
+                        sites={sites}
                         values={values}
                         errors={errors}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={isSubmitting || apiStatus.isFetching}
                         />}
+                        {
+                            apiStatus.action === "FILE_REPORT" && apiStatus.status.status && (
+                                <Typography variant="h6">
+                                    {apiStatus.status.status === 201 ? "Filed Successfully" : "ERROR, Please contact BIPI"}
+                                </Typography>
+                            )
+                        }
+                        {
+                            apiStatus.action === "FILE_REPORT" && apiStatus.isFetching && (
+                                <Typography variant="h6">
+                                    {"Pending"}
+                                </Typography>
+                            )
+                        }
                     </Form>
                     );
                 }}
                 </Formik>
             </div>
-)};
+          )
+        };
+};
 
 export default FileReportForm;

@@ -4,9 +4,6 @@ import { CircularProgress, Grid } from '@material-ui/core';
 import PropTypes from 'prop-types'
 
 const LoginPrompt = ({firebase, authLoaded, authenticated}) => {
-  if(authenticated)
-    return "";
-  else
     return (
         <Grid
             container
@@ -43,7 +40,7 @@ const LoginPrompt = ({firebase, authLoaded, authenticated}) => {
 LoginPrompt.propTypes = {
     firebase: PropTypes.object.isRequired,
     authLoaded: PropTypes.bool.isRequired,
-    authenticated: PropTypes.string.isRequired
+    authenticated: PropTypes.bool.isRequired
 }
 
 export default LoginPrompt

@@ -1,8 +1,9 @@
 import React, { forwardRef } from 'react';
 import MaterialTable from 'material-table'
-import PropTypes from 'prop-types'
-import DeleteReportPrompt from './DeleteReportPrompt'
-import EditReportDialog from './EditReportDialog';
+import DeleteReportPromptContainer from './DeleteReportPromptContainer'
+import EditReportDialogContainer from './EditReportDialogContainer';
+import FileReportDialogContainer from './FileReportDialogContainer';
+import AppBar from './AppBar';
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -19,6 +20,10 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import Paper from '@material-ui/core/Paper';
+import TableContainer from '@material-ui/core/TableContainer';
+import Box from '@material-ui/core/Box';
+import { Typography } from '@material-ui/core';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -40,12 +45,18 @@ const tableIcons = {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-const ReportsTable = ({ reports }) => {
+const ReportsTable = ({ reports, authToken, fetchFromAPI, auth, isLoading, newData }) => {
     const [openDeletePrompt, setOpenDeletePrompt] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
+    const [openCreateDialog, setOpenCreateDialog] = React.useState(false);
     const [selectedReportUUID, setSelectedReportUUID] = React.useState('');
 
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+    React.useEffect(() => {
+        if(authToken && authToken.trim() !== '' && newData)
+            fetchFromAPI(auth.email);
+    }, [authToken, auth.email, fetchFromAPI, newData]);
+
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
                 'Oct', 'Nov', 'Dec'];
 
     const findReportByUUID = (uuid) => reports.find((r) => r.uuid === uuid);
@@ -55,15 +66,22 @@ const ReportsTable = ({ reports }) => {
     };
 
     const composeEditReportParams = (report) => { 
-        return {reportUUID: report.uuid, siteName: report.site.name, reportDate: reportPeriodFunc(report), counts: report.counts} 
+        return {
+            reportUUID: report.uuid, 
+            siteName: report.site.name, 
+            reportDate: reportPeriodFunc(report), 
+            items: report.items, 
+            notes: report.notes,
+            reportType: report.resourcetype
+        } 
     };
 
-    const allCountsFunc = (rowData) => {
-        if(!rowData.counts)
+    const allItemsFunc = (rowData) => {
+        if(!rowData.items)
             return "";
-        return rowData.counts.map((c, i) => {
+        return rowData.items.map((c, i) => {
             return (
-                <div key={c.category.uuid}> 
+                <div key={c.uuid}> 
                     {c.category.name}: <b>{c.count}</b><br />
                 </div>
             )
@@ -71,8 +89,8 @@ const ReportsTable = ({ reports }) => {
     };
 
     const reportPeriodFunc = (rowData) => {
-        if(rowData.month && rowData.year)
-            return months[rowData.month - 1] + ", " + rowData.year;
+        if(rowData.resourcetype === "MonthlyReport")
+            return MONTHS[parseInt(rowData.year_month.split('-')[1]) - 1] + ", " + rowData.year_month.split('-')[0]; 
         else
             return rowData.date;
     };
@@ -88,87 +106,89 @@ const ReportsTable = ({ reports }) => {
     };
 
     const dateSubmittedFunc = (rowData) => {
-        if(rowData.submitTS)
-            return rowData.submitTS.split('T')[0];
+        if(rowData.modified)
+            return new Date(rowData.modified).toLocaleString();
         else
             return "";
     };
 
     return (
-        <div style={{ maxWidth: "100%" }}>
-            <MaterialTable
-                icons={tableIcons}
-                columns={[
-                    { title: "Site Name", field: "site.name" },
-                    { 
-                        title: "Report Period", 
-                        render: reportPeriodFunc,
-                        customSort: reportPeriodSortFunc,
-                        customFilterAndSearch: (f, r, _) => reportPeriodFunc(r).includes(f)
-                    },
-                    { title: "Closed", field: "closed", type: "boolean" },
-                    { title: "Counts", render: allCountsFunc, sorting: false },
-                    { 
-                        title: "Date Submitted", 
-                        render: dateSubmittedFunc,
-                        customSort: (a, b) => new Date(a.submitTS) - new Date(b.submitTS),
-                        customFilterAndSearch: (f, r, _) => dateSubmittedFunc(r).includes(f)
-                    },
-                    { title: "Notes", field: "notes" }
-                ]}
-                data={reports}
-                title="My Site Reports"
-                options={{
-                    sorting: true,
-                    search: true,
-                    rowStyle: (r, i) => {
-                        if (i % 2) {
-                            return {backgroundColor: "#f2f2f2"}
+        <Box m={4} >
+            <TableContainer component={Paper} elevation={3}>
+                <MaterialTable
+                    icons={tableIcons}
+                    isLoading={isLoading}
+                    columns={[
+                        { title: "Site Name", field: "site.name" },
+                        { 
+                            title: "Report Period", 
+                            render: reportPeriodFunc,
+                            customSort: reportPeriodSortFunc,
+                            customFilterAndSearch: (f, r, _) => reportPeriodFunc(r).includes(f)
+                        },
+                        { title: "Closed", field: "closed", type: "boolean" },
+                        { title: "Items", render: allItemsFunc, sorting: false },
+                        { 
+                            title: "Last Modified", 
+                            render: dateSubmittedFunc,
+                            customSort: (a, b) => new Date(a.modified) - new Date(b.modified),
+                            customFilterAndSearch: (f, r, _) => dateSubmittedFunc(r).includes(f)
                         }
-                    }
-                }}
-                actions={[
-                    {
-                        icon: tableIcons.Edit,
-                        tooltip: 'Edit Report',
-                        onClick: (event, rowData) => {
-                            setOpenEditDialog(true);
-                            setSelectedReportUUID(rowData.uuid);                          
+                    ]}
+                    data={reports}
+                    title={<AppBar openFileReportDialog={() => setOpenCreateDialog(true)} />}
+                    options={{
+                        sorting: true,
+                        search: true,
+                        rowStyle: (r, i) => {
+                            if (i % 2) {
+                                return {backgroundColor: "#f2f2f2"}
+                            }
+                        },
+                        pageSize: 10
+                    }}
+                    detailPanel={rowData => {
+                        return (<Box m={3}><Typography variant="body1">{`Notes: ${rowData.notes}`}</Typography></Box>)
+                    }}
+                    actions={[
+                        {
+                            icon: tableIcons.Edit,
+                            tooltip: 'Edit Report',
+                            onClick: (event, rowData) => {
+                                setOpenEditDialog(true);
+                                setSelectedReportUUID(rowData.uuid);                          
+                            }
+                        },
+                        {
+                            icon: tableIcons.Delete,
+                            tooltip: 'Delete Report',
+                            onClick: (event, rowData) => {
+                                setOpenDeletePrompt(true);
+                                setSelectedReportUUID(rowData.uuid);
+                            }
                         }
-                    },
-                    {
-                        icon: tableIcons.Delete,
-                        tooltip: 'Delete Report',
-                        onClick: (event, rowData) => {
-                            setOpenDeletePrompt(true);
-                            setSelectedReportUUID(rowData.uuid);
-                        }
-                    }
-                ]}
-            />
-            {
-                openDeletePrompt && 
-                <DeleteReportPrompt 
-                    {...composeDeleteReportParams(findReportByUUID(selectedReportUUID))} 
-                    handleClose={() => setOpenDeletePrompt(false)} />
-            }
-            {
-                openEditDialog && 
-                <EditReportDialog 
-                    {...composeEditReportParams(findReportByUUID(selectedReportUUID))} 
-                    handleClose={() => setOpenEditDialog(false)} />
-            }
-        </div>
+                    ]}
+                />
+                {
+                    openDeletePrompt && findReportByUUID(selectedReportUUID) &&
+                    <DeleteReportPromptContainer 
+                        {...composeDeleteReportParams(findReportByUUID(selectedReportUUID))} 
+                        handleClose={() => setOpenDeletePrompt(false)} />
+                }
+                {
+                    openEditDialog && 
+                    <EditReportDialogContainer
+                        {...composeEditReportParams(findReportByUUID(selectedReportUUID))} 
+                        handleClose={() => setOpenEditDialog(false)} />
+                }
+                {
+                    openCreateDialog && 
+                    <FileReportDialogContainer 
+                        handleClose={() => setOpenCreateDialog(false)} />
+                }
+            </TableContainer>
+        </Box>
     );
 }
-
-ReportsTable.propTypes = {
-    reports: PropTypes.arrayOf(
-        PropTypes.shape({
-            
-        })
-    ).isRequired
-}
-
 
 export default ReportsTable
