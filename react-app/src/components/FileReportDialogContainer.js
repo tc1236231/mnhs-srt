@@ -27,7 +27,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const FileReportDialogContainer = ({user, reports, fileReportFunc, handleClose, apiStatus}) => {
+const FileReportDialogContainer = ({user, reports, fileReportFunc, handleClose}) => {
     const classes = useStyles();
 
     return (
@@ -49,7 +49,7 @@ const FileReportDialogContainer = ({user, reports, fileReportFunc, handleClose, 
                 alignItems="center"
             >
                 <Box m={3}>
-                    <FileReportForm {...{user, reports, fileReportFunc, apiStatus}}/>
+                    <FileReportForm {...{user, reports, fileReportFunc, handleClose}}/>
                 </Box>
             </Grid>
         </Dialog>
@@ -58,8 +58,7 @@ const FileReportDialogContainer = ({user, reports, fileReportFunc, handleClose, 
 
 const mapStateToProps = (state) => ({
     user: state.user.data,
-    reports: state.report.items,
-    apiStatus: state.apiAction
+    reports: state.report.items
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

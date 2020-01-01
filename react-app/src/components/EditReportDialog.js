@@ -7,11 +7,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Formik, Field, Form } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { Typography } from '@material-ui/core';
 
 const EditReportDialog = ({
         reportUUID, siteName, reportDate, items, notes, 
-        reportType, handleClose, editReportFunc, apiStatus
+        reportType, handleClose, editReportFunc
     }) => {
     const validatelInteger = (num) => {
         return num !== Infinity && num >= 0 ? "" : "Incorrect Format"
@@ -48,6 +47,7 @@ const EditReportDialog = ({
                 }));
                 editReportFunc(reportUUID, submitValues);
                 setSubmitting(false);
+                handleClose();
             }}
             >
             {({submitForm, ...restProps}) => {
@@ -86,24 +86,10 @@ const EditReportDialog = ({
                     </Form>
                     </DialogContent>
                     <DialogActions>
-                    {
-                        apiStatus.action === "EDIT_REPORT" && apiStatus.status.status && (
-                            <Typography variant="h6">
-                                {apiStatus.status.status === 200 ? "Saved Successfully" : "ERROR, Please contact BIPI"}
-                            </Typography>
-                        )
-                    }
-                    {
-                        apiStatus.action === "EDIT_REPORT" && apiStatus.isFetching && (
-                            <Typography variant="h6">
-                                {"Pending"}
-                            </Typography>
-                        )
-                    }
                     <Button onClick={handleClose} color="primary" autoFocus>
                         Cancel
                     </Button>
-                    <Button onClick={submitForm} color="primary" disabled={apiStatus.isFetching}>
+                    <Button onClick={submitForm} color="primary">
                         Save
                     </Button>
                     </DialogActions>

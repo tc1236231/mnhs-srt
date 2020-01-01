@@ -1,6 +1,8 @@
+import React from 'react'
 import ReportsTable from './ReportsTable';
 import { requestAPI } from '../redux/actions'
 import { connect } from 'react-redux'
+import ApiActionStatusDialogContainer from './ApiActionStatusDialogContainer'
 
 const mapStateToProps = (state) => ({
     reports: state.report.items,
@@ -14,7 +16,18 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     fetchFromAPI: (email) => dispatch(requestAPI(email))
 })
 
-export default connect(
+const ReportsTableMapped = connect(
     mapStateToProps,
     mapDispatchToProps
 )(ReportsTable)
+
+const ReportsTableContainer = () => {
+    return (
+        <div>
+            <ApiActionStatusDialogContainer></ApiActionStatusDialogContainer>
+            <ReportsTableMapped></ReportsTableMapped>
+        </div>
+    )
+}
+
+export default ReportsTableContainer

@@ -46,7 +46,7 @@ export function fileReport(report) {
             withCredentials: true 
           })
           .then(response => response)
-          .then(status => dispatch(receiveAPIAction(FILE_REPORT, status)))
+          .then(status => dispatch(receiveAPIAction(FILE_REPORT, status.status === 201, status)))
           .catch(error => dispatch(failAPIAction(FILE_REPORT, error)))
     }
 }
@@ -62,7 +62,7 @@ export function editReport(reportUUID, values) {
             withCredentials: true 
           })
           .then(response => response)
-          .then(status => dispatch(receiveAPIAction(EDIT_REPORT, status)))
+          .then(status => dispatch(receiveAPIAction(EDIT_REPORT, status.status === 200, status)))
           .catch(error => dispatch(failAPIAction(EDIT_REPORT, error)))
     }
 }
@@ -76,17 +76,17 @@ export function deleteReport(reportUUID) {
             withCredentials: true 
           })
           .then(response => response)
-          .then(status => dispatch(receiveAPIAction(DELETE_REPORT, status)))
+          .then(status => dispatch(receiveAPIAction(DELETE_REPORT, status.status === 204, status)))
           .catch(error => dispatch(failAPIAction(DELETE_REPORT, error)))
     }
 }
 
 export function failAPIAction(action, error) {
-    return { type: FAIL_API_ACTION, action: action, status: error.status, error, receivedAt: Date.now()}
+    return { type: FAIL_API_ACTION, action: action, statusText: "Request Failed. Please contact BIPI.", error, receivedAt: Date.now()}
 }
 
-export function receiveAPIAction(action, status) {
-    return { type: RECEIVE_API_ACTION, action: action, status, receivedAt: Date.now()}
+export function receiveAPIAction(action, success, meta) {
+    return { type: RECEIVE_API_ACTION, action: action, statusText: `${action} ${success ? "Success" : "Failed"}`, meta, receivedAt: Date.now()}
 }
 
 export function fetchAPI(email) {

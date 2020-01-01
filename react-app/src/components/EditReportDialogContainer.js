@@ -3,7 +3,6 @@ import { editReport } from '../redux/actions'
 import { connect } from 'react-redux'
 
 const mapStateToProps = (state) => ({
-    apiStatus: state.apiAction
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

@@ -5,9 +5,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Typography } from '@material-ui/core';
 
-const DeleteReportPrompt = ({reportUUID, siteName, reportDate, handleClose, deleteReportFunc, apiStatus}) => {
+const DeleteReportPrompt = ({reportUUID, siteName, reportDate, handleClose, deleteReportFunc}) => {
     return (
         <Dialog
         open={true}
@@ -22,24 +21,10 @@ const DeleteReportPrompt = ({reportUUID, siteName, reportDate, handleClose, dele
             </DialogContentText>
             </DialogContent>
             <DialogActions>
-            {
-                apiStatus.action === "DELETE_REPORT" && apiStatus.status.status && (
-                    <Typography variant="h6">
-                        {apiStatus.status.status === 204 ? "Deleted Successfully" : "ERROR, Please contact BIPI"}
-                    </Typography>
-                )
-            }
-            {
-                apiStatus.action === "DELETE_REPORT" && apiStatus.isFetching && (
-                    <Typography variant="h6">
-                        {"Pending"}
-                    </Typography>
-                )
-            }
             <Button onClick={handleClose} color="primary" autoFocus>
                 No
             </Button>
-            <Button onClick={() => deleteReportFunc(reportUUID)} color="primary" disabled={apiStatus.isFetching}>
+            <Button onClick={() => {deleteReportFunc(reportUUID); handleClose()}} color="primary">
                 Yes
             </Button>
             </DialogActions>

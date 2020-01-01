@@ -1,7 +1,6 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, number, string, boolean, date } from 'yup';
-import { Typography } from '@material-ui/core';
 
 const currentDate = new Date();
 
@@ -200,7 +199,7 @@ function SiteDependentFields({sites, values, errors, isSubmitting}) {
   );
 }
 
-const FileReportForm = ({ user, reports, fileReportFunc, apiStatus}) => {
+const FileReportForm = ({ user, reports, fileReportFunc, handleClose}) => {
     if (typeof user === 'undefined' || user.assignments === undefined)
         return <h2 style={{color: 'red'}}>Error: Not Enough User Info</h2>
     else {
@@ -284,6 +283,7 @@ const FileReportForm = ({ user, reports, fileReportFunc, apiStatus}) => {
                     fileReportFunc(report);
                     setSubmitting(false);
                     resetForm();
+                    handleClose();
                 }}
                 >
                 {({ values, touched, errors, handleChange, isSubmitting }) => {
@@ -323,22 +323,8 @@ const FileReportForm = ({ user, reports, fileReportFunc, apiStatus}) => {
                         sites={sites}
                         values={values}
                         errors={errors}
-                        isSubmitting={isSubmitting || apiStatus.isFetching}
+                        isSubmitting={isSubmitting}
                         />}
-                        {
-                            apiStatus.action === "FILE_REPORT" && apiStatus.status.status && (
-                                <Typography variant="h6">
-                                    {apiStatus.status.status === 201 ? "Filed Successfully" : "ERROR, Please contact BIPI"}
-                                </Typography>
-                            )
-                        }
-                        {
-                            apiStatus.action === "FILE_REPORT" && apiStatus.isFetching && (
-                                <Typography variant="h6">
-                                    {"Pending"}
-                                </Typography>
-                            )
-                        }
                     </Form>
                     );
                 }}

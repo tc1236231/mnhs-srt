@@ -10,7 +10,8 @@ function apiActionReducer(
       isFetching: false,
       newData: true,
       action: '',
-      status: {}
+      statusText: '',
+      meta: {}
     },
     action
   ) {
@@ -24,22 +25,24 @@ function apiActionReducer(
                 isFetching: true,
                 newData: false,
                 action: action.action,
-                status: {}
+                statusText: 'Pending',
+                meta: {}
             })
         case RECEIVE_API_ACTION:
             return Object.assign({}, state, {
                 isFetching: false,
                 newData: true,
                 action: action.action,
-                status: action.status
+                statusText: action.statusText,
+                meta: action.meta
             })
         case FAIL_API_ACTION:
             return Object.assign({}, state, {
                 isFetching: false,
                 newData: false,
                 action: action.action,
-                status: action.status,
-                error: action.error
+                statusText: action.statusText,
+                meta: action.error
             })
       default:
         return state
