@@ -28,11 +28,20 @@ const AppBar = ({openFileReportDialog}) => {
         <Toolbar>
             <img src={logo} alt="logo" className={classes.logo} draggable="false" />
             {
-                authenticated && user && user.data && (
+                authenticated && user.data && (
                     <Box ml={5}>
                         <Button onClick={openFileReportDialog}>File a Report</Button>
                         <Typography color="textSecondary" className={classes.userName} variant="caption">Logged In as {user.data.displayName}</Typography>
                         <Button onClick={() => firebase.logout()}>Log Out</Button> 
+                    </Box>
+                )
+            }
+            {
+                authenticated && !user.data && (
+                    <Box ml={5}>
+                        <Typography variant="h6" color="error">
+                            Fail to acquire user data - {user.error && user.error.message}
+                        </Typography>
                     </Box>
                 )
             }
